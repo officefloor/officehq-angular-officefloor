@@ -7,10 +7,10 @@ one full-stack English change request per checkpoint — committing each checkpo
 branch. The base branch is only ever read.
 
 **This folder is a skeleton: every item below is a stub with `TODO` markers.** Fill them in to get
-a runnable base. Because the harness only depends on the *contract* (not the tech), you can copy
-this folder to `~/compare/officehq-app-<other-tech>`, satisfy the same checklist with a different
-stack, and point `app.repo` at it — that is how "different base repositories with different
-technologies" are tried, one run each.
+a runnable base. Because the harness only depends on the *contract* (not the tech), you create a
+new stack as a **home-level sibling** `~/officehq-<stack>`, satisfy the same checklist with a
+different technology, and point `app.repo` at it — that is how different technology stacks are
+compared, one run each, to see which resists erosion best.
 
 ---
 
