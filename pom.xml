@@ -12,8 +12,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <!-- Standard Spring Boot app parent. Spring Boot 4.1.0 = the SB4 line in the OfficeFloor BOM.
-       TODO: confirm 4.1.0 is the exact version to track (it is what OfficeFloor 4.0.2 targets). -->
+  <!-- Standard Spring Boot app parent. Spring Boot 4.1.0 = the SB4 line in the OfficeFloor BOM
+       (net.officefloor:bom @ 4.0.2, spring-version=4.1.0). VERIFIED to resolve via `mvn dependency:
+       resolve` (BUILD SUCCESS): parent + all deps + build plugins resolve from Maven Central. -->
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
@@ -28,7 +29,9 @@
 
   <properties>
     <java.version>17</java.version>
-    <!-- OfficeFloor current release (net.officefloor:bom revision). -->
+    <!-- OfficeFloor current release (net.officefloor:bom revision). VERIFIED: officefloor-rest-
+         spring-boot-4-starter:4.0.2 resolves. NOTE: its jar has no automatic module name ('4' is
+         not a valid Java identifier) — harmless on the classpath; would matter only for JPMS. -->
     <officefloor.version>4.0.2</officefloor.version>
     <node.version>v20.11.1</node.version>
     <npm.version>10.2.4</npm.version>
