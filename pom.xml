@@ -60,6 +60,11 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-actuator</artifactId>
     </dependency>
+    <!-- Bean Validation provider (Hibernate Validator) — OfficeFloor REST / Spring bind + @Valid. -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-validation</artifactId>
+    </dependency>
 
     <!-- In-memory H2 + Flyway schema migrations on boot (Spring-managed). -->
     <dependency>
