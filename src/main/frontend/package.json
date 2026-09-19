@@ -1,0 +1,11 @@
+{
+  "//": "SKELETON front-end shell (BASE_CHECKLIST.md §B). TODO: real deps + a `build` script that",
+  "//build": "outputs the SPA into ../resources/static (e.g. vite build --outDir ../resources/static).",
+  "name": "officehq-frontend",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "echo 'TODO: build SPA into ../resources/static' && exit 1",
+    "dev": "echo 'TODO: dev server (optional)' && exit 1"
+  }
+}

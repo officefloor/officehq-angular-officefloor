@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# The agent's test loop (DESIGN.md §15): build, start the whole app, run ONLY the specs currently
+# present in e2e/specs (the agent sees only its own checkpoint's spec — blind), then stop.
+# PINNED — do not edit. Contract: BASE_CHECKLIST.md §C, §D.
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+export PORT="${PORT:-3000}"
+
+bin/build
+bin/start
+cleanup() { bin/stop || true; }
+trap cleanup EXIT
+
+# TODO: wait for readiness, then run the Playwright project against http://localhost:$PORT, e.g.:
+#   ./bin/_wait_ready "http://localhost:$PORT/actuator/health"
+#   (cd e2e && npx playwright test)      # baseURL from playwright.config.ts
+
+echo "TODO: implement bin/e2e (wait_ready + playwright) — see BASE_CHECKLIST.md §D" >&2
+exit 1

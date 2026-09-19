@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  SKELETON build for the base app. TODO: complete against your real Spring Boot + OfficeFloor
+  plugin coordinates. This must produce ONE runnable jar that embeds H2, runs Flyway on boot,
+  and serves the SPA (built into src/main/resources/static) + the API. See BASE_CHECKLIST.md §B.
+
+  Dependencies to wire in (verify versions at build time):
+    - spring-boot-starter-web
+    - spring-boot-starter-actuator            (health probe)
+    - OfficeFloor Spring plugin               (OfficeFloor within Spring — your coordinates)
+    - com.h2database:h2                        (runtime; in-memory)
+    - org.flywaydb:flyway-core                 (schema migrations on boot)
+    - (test/dev) whatever the /__test__ support needs
+
+  Front-end build: either the frontend-maven-plugin (com.github.eirslett) driving
+  `npm ci && npm run build` with output to src/main/resources/static, OR let bin/build run the
+  front-end build separately before packaging. Keep bin/build as the single entry point.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>net.officefloor.hq</groupId>
+  <artifactId>officehq-app</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <packaging>jar</packaging>
+
+  <!-- TODO: parent (spring-boot-starter-parent) or dependencyManagement, properties, dependencies,
+       and the build plugins (spring-boot-maven-plugin, front-end build). -->
+
+</project>

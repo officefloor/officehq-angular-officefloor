@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# Start the whole app on $PORT: java -jar the built jar. On boot, Flyway migrates the empty
+# in-memory H2 up to the current schema and Spring serves the SPA (static) + API. Returns once
+# launching (the harness polls /actuator/health). PINNED — do not edit. Contract: §B, §C.
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+: "${PORT:?PORT must be set by the harness}"
+
+# Enable the test-support profile so the /__test__ seed endpoint is active (BASE_CHECKLIST.md §D).
+JAR="$(ls -t target/*.jar build/libs/*.jar 2>/dev/null | head -n1 || true)"
+
+# TODO: launch the jar in the background, record its pid for bin/stop, e.g.:
+#   nohup java -jar "$JAR" --server.port="$PORT" --spring.profiles.active=harness \
+#        > .run/app.log 2>&1 &
+#   echo $! > .run/app.pid
+
+echo "TODO: implement bin/start (jar=$JAR, port=$PORT) — see BASE_CHECKLIST.md §B,§C" >&2
+exit 1
