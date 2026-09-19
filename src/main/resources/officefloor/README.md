@@ -1,10 +1,13 @@
 # OfficeFloor REST wiring
 
 Domain REST endpoints are declared here as **additive OfficeFloor YAML**, served by the
-officefloor-rest-spring-boot-4-starter inside the Spring Boot host. Each route is its own file:
+officefloor-rest-spring-boot-4-starter inside the Spring Boot host. Put them under `rest/api/` so
+their paths start with `/api/` — `SpaConfig` only bypasses the SPA deep-link fallback for `/api/*`
+(a non-`/api/` route returns the SPA HTML instead of your endpoint). Directory nesting maps to path
+segments, so `rest/api/owners.GET.yml` → `GET /api/owners`. Each route is its own file:
 
 ```
-# officefloor/rest/<path>.GET.yml   (or .POST.yml, {param}.GET.yml, ...)
+# officefloor/rest/api/<path>.GET.yml   (or .POST.yml, {param}.GET.yml, ...)
 service:
   class: net.officefloor.hq.app.<SomeLogic>   # a class with a service(...) method
 ```

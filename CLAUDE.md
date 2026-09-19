@@ -13,7 +13,10 @@ local change.
 - **Schema changes are Flyway migrations.** Add a new versioned migration under
   `src/main/resources/db/migration/`; never edit an applied migration.
 - **Data is seeded through the app's own API in tests**, not committed as fixtures. If your feature
-  needs new seed capability, extend the `/__test__` seed support.
+  needs new seed capability, extend the `/__test__` seed support. Seed with a `JdbcTemplate` using
+  the **explicit ids from the fixture** (JPA `save()` with an IDENTITY id ignores a supplied id and
+  generates its own — the spec asserts rows by the fixture's ids, so they must match). `reset`
+  should `TRUNCATE ... RESTART IDENTITY` the tables it clears.
 - **Audit / side-effect records go through the `Audit` service** (inject `Audit`, call
   `record(...)`). It appends one record per line to the known audit file that tests read — that is
   how audited behaviour is verified (the UI can't show it). Use the exact record text the task's
@@ -31,10 +34,13 @@ local change.
 
 - `src/main/frontend/**` — the React front-end (TypeScript). `router/` and `ui/` are shared
   surfaces; a new page is a new file, not an edit to `router/`.
-- `src/main/resources/officefloor/rest/<path>.<METHOD>.yml` — a REST endpoint = a **new YAML file**
-  (`service: { class: net.officefloor.hq.app.<Logic> }`) + a **new logic class** whose
-  `service(...)` method takes injected Spring beans/data + `ObjectResponse<T>`. Additive: one file
-  per endpoint, never a central router.
+- `src/main/resources/officefloor/rest/api/<path>.<METHOD>.yml` — a REST endpoint = a **new YAML
+  file** (`service: { class: net.officefloor.hq.app.<Logic> }`) + a **new logic class** whose
+  `service(...)` method takes injected Spring beans/data + `ObjectResponse<T>` (and, for a body,
+  a param with `@RequestBody`). Additive: one file per endpoint, never a central router. **Put
+  domain routes under `rest/api/`** so their paths start with `/api/` — `SpaConfig` only lets
+  `/api/*` bypass the SPA deep-link fallback; a non-`/api/` route is swallowed and returns the
+  SPA HTML instead of your endpoint.
 - `src/main/java/**` — logic classes and Spring `@Service`/`@Repository` beans (business logic +
   data access). `Application`, `SpaConfig`, `TestSupportController` are base infrastructure.
 - `src/main/resources/db/migration/**` — Flyway migrations (new `V<n>__*.sql` per schema change).

@@ -7,5 +7,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 # One command: the pom's frontend-maven-plugin builds the SPA into src/main/resources/static.
-exec ./mvnw -q -DskipTests package
+# `clean` first so removed sources (e.g. a deleted route .yml or class) can't linger in
+# target/classes and get baked into the jar (found via the cp01 dry run).
+exec ./mvnw -q -DskipTests clean package
 # TODO: add the Maven wrapper (./mvnw) or switch to `mvn` if a system Maven is guaranteed.
