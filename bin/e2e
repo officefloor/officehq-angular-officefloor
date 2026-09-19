@@ -19,4 +19,5 @@ for i in $(seq 1 60); do
   sleep 1
 done
 
-( cd e2e && npm ci --silent && npx playwright test )
+# Install deps + the Chromium browser (both cached after first run), then run the specs.
+( cd e2e && npm ci --silent && npx --yes playwright install chromium && npx playwright test )
