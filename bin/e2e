@@ -6,15 +6,17 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 export PORT="${PORT:-3000}"
+export BASE_URL="http://localhost:${PORT}"
 
 bin/build
 bin/start
 cleanup() { bin/stop || true; }
 trap cleanup EXIT
 
-# TODO: wait for readiness, then run the Playwright project against http://localhost:$PORT, e.g.:
-#   ./bin/_wait_ready "http://localhost:$PORT/actuator/health"
-#   (cd e2e && npx playwright test)      # baseURL from playwright.config.ts
+# Wait for readiness (the /health route), then run the Playwright specs against BASE_URL.
+for i in $(seq 1 60); do
+  if curl -fsS "${BASE_URL}/health" >/dev/null 2>&1; then break; fi
+  sleep 1
+done
 
-echo "TODO: implement bin/e2e (wait_ready + playwright) — see BASE_CHECKLIST.md §D" >&2
-exit 1
+( cd e2e && npm ci --silent && npx playwright test )

@@ -1,0 +1,9 @@
+# H2 in-memory DataSource, managed by OfficeFloor (officejdbc_h2). One JVM; dies with the process,
+# so a fresh boot = empty DB (Flyway then migrates it up). Verified shape: OfficeFloor tutorial
+# DatabaseHttpServer/src/main/resources/officefloor/objects/DataSource.yml.
+managed-object:
+  source: net.officefloor.jdbc.DataSourceManagedObjectSource
+  properties:
+    datasource.class: org.h2.jdbcx.JdbcDataSource
+    url: "jdbc:h2:mem:officehq;DB_CLOSE_DELAY=-1"
+    user: sa

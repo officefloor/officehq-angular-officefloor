@@ -14,41 +14,49 @@ a runnable base. Because the harness only depends on the *contract* (not the tec
 new stack as a **home-level sibling** `~/officehq-<frontend>-<backend>` (name both layers, since
 either may vary), satisfy the same checklist with a different technology, and point `app.repo` at
 it — that is how different technology stacks are compared, one run each, to see which resists
-erosion best. §B below is written for this Spring/OfficeFloor/H2 stack; a different-backend sibling
+erosion best. §B below is written for this WoOF/OfficeFloor/H2 stack; a different-backend sibling
 adapts §B's specifics but must keep the same *properties*: one embedded JVM (no daemon/container),
-schema migrated on boot, static-served SPA, Actuator-style health, and the `/__test__` seed
+schema migrated on boot, a static-served SPA, a `/health` readiness route, and the `/__test__` seed
 endpoint.
 
 ---
 
 ## A. The base must start NEAR-EMPTY
 
-- [ ] **No domain tables.** `src/main/resources/db/migration/` has no Flyway migrations that create
-      domain tables (a baseline `V0__baseline.sql` for extensions/`__test__` support only is fine).
-      cp01 creates the first real tables.
-- [ ] **No domain features.** The front-end is a bare shell (nav frame + empty home), the backend
-      has no domain endpoints. The app **builds, boots, and serves an empty shell** as-is.
-- [ ] **It is green before cp01.** `bin/build` succeeds and `bin/start` serves `/actuator/health`
-      = UP and the shell renders, from a clean checkout of `base-empty`.
+- [ ] **No domain tables.** `src/main/resources/db/migration/` has no Flyway migrations at base
+      (empty dir with `.gitkeep`). cp01 adds `V1__*.sql` creating the first real tables.
+- [ ] **No domain features.** The front-end is a bare shell (empty home), the backend has only the
+      `/health` and `/__test__` routes. The app **builds, boots, and serves the shell** as-is.
+- [ ] **It is green before cp01.** `bin/build` succeeds and `bin/start` serves `/health` = UP and
+      the shell renders, from a clean checkout of `base-empty`.
 
 ## B. One embedded stack (DESIGN.md §14, §15 — must run under Landlock)
 
-- [ ] **Single JVM, no daemon/container.** Spring Boot app; OfficeFloor within Spring as a plugin.
-- [ ] **In-memory H2** (`jdbc:h2:mem:app;DB_CLOSE_DELAY=-1`), auto-configured; dies with the JVM.
-- [ ] **Flyway** runs migrations on boot to build the schema up from empty.
-- [ ] **SPA served as static files** from `src/main/resources/static` with an SPA deep-link
-      fallback (unknown non-`api/` path → `index.html`). `src/main/frontend` builds into `static/`.
-- [ ] **Spring Actuator** health at `/actuator/health` (the harness readiness probe).
+- [ ] **Single JVM, no daemon/container.** WoOF (OfficeFloor) is the HTTP server; Spring is
+      supplied into it (`officespring_webmvc`, `officefloor/suppliers/Spring.yml`). Executable jar
+      built by `spring-boot-maven-plugin` with main class `net.officefloor.OfficeFloorMain`.
+- [ ] **In-memory H2** via OfficeFloor's `officejdbc_h2` — `officefloor/objects/DataSource.yml`
+      (`jdbc:h2:mem:officehq;DB_CLOSE_DELAY=-1`); dies with the JVM.
+- [ ] **Flyway on boot** via OfficeFloor's `officeflyway_migrate`, from `src/main/resources/db/
+      migration` — builds the schema up from empty.
+- [ ] **SPA served from `src/main/resources/PUBLIC`** (WoOF serves static content from `PUBLIC/`).
+      `src/main/frontend` builds into `PUBLIC/`. TODO: SPA deep-link fallback for client routes
+      (a WoOF catch-all route → `index.html`) if the tests deep-link.
+- [ ] **`/health` route** (`officefloor/rest/health.GET.yml` → `Health.check`) — the harness
+      readiness probe (`config.yaml → app.health_url`). OfficeFloor has no Spring Actuator.
 - [ ] No external services, no network egress needed to build/boot (toolchain resolvable offline
-      or pre-warmed — the agent turn is Landlock-confined).
+      or pre-warmed — the agent turn is Landlock-confined; note `frontend-maven-plugin` and Maven
+      must have node/deps available offline or pre-fetched).
 
 ## C. Fixed operational scaffolding (PINNED — agent runs but never edits; DESIGN.md §15)
 
 These commands must stay constant across checkpoints even as the app evolves. They are in
 `config.yaml → isolation.pin_files` and restored to authored before every gate.
 
-- [ ] `bin/build` — compile backend + front-end into one runnable jar (SPA baked into `static/`).
-- [ ] `bin/start` — `java -jar <the built jar> --server.port=$PORT`; exits 0 once launching.
+- [ ] `bin/build` — Maven build; `frontend-maven-plugin` builds the SPA into `PUBLIC/`, then
+      `spring-boot-maven-plugin` repackages the WoOF app into `target/*.jar`.
+- [ ] `bin/start` — `java -jar target/*.jar --http.port=$PORT` (main `OfficeFloorMain`); exits 0
+      once launching (records pid for `bin/stop`). TODO: confirm the port flag + harness profile.
 - [ ] `bin/stop` — kill the JVM / free `$PORT`; **idempotent** (safe when nothing runs / after a
       crash). The harness may also kill by port.
 - [ ] `bin/e2e` — build + start + run **only the specs currently present** in `e2e/specs` +
@@ -82,17 +90,18 @@ These commands must stay constant across checkpoints even as the app evolves. Th
 ## F. Layout the harness expects (matches `config.yaml`)
 
 ```
-bin/{build,start,stop,e2e}                      # pinned scaffolding (C)
-src/main/java/**/*.java                          # backend (source_globs.backend)
-src/main/resources/application.properties        # H2 + Flyway + actuator + SPA static
-src/main/resources/db/migration/                 # Flyway migrations (empty at base)
-src/main/resources/officefloor/                  # OfficeFloor wiring (shared_surfaces.backend)
-src/main/resources/static/                        # SPA build output (served)
-src/main/frontend/**/*.{ts,tsx}                  # front-end (source_globs.frontend)
-src/main/frontend/{router,ui}/                    # shared_surfaces.frontend
-e2e/{playwright.config.ts,package.json,support/} # Playwright project (specs copied in per cp)
-CLAUDE.md, AGENTS.md                              # pinned agent instructions
-pom.xml (or build.gradle)                         # one build producing the runnable jar
+bin/{build,start,stop,e2e}                       # pinned scaffolding (C)
+pom.xml                                           # one Maven build -> the runnable jar
+src/main/java/**/*.java                           # backend (source_globs.backend)
+src/main/resources/officefloor/objects/*.yml      # DataSource + Connection managed objects
+src/main/resources/officefloor/suppliers/Spring.yml  # Spring supplied into OfficeFloor
+src/main/resources/officefloor/rest/**/*.yml      # WoOF routes (shared_surfaces.backend); health + __test__
+src/main/resources/db/migration/                  # Flyway migrations (empty at base)
+src/main/resources/PUBLIC/                         # SPA build output, served by WoOF
+src/main/frontend/**/*.{ts,tsx}                   # front-end source (source_globs.frontend); builds into PUBLIC/
+src/main/frontend/{router,ui}/                     # shared_surfaces.frontend
+e2e/{playwright.config.ts,package.json,support/}  # Playwright project (specs copied in per cp)
+CLAUDE.md, AGENTS.md                               # pinned agent instructions
 ```
 
 - [ ] `config.yaml → app.source_globs` / `shared_surfaces` match the real paths (so per-layer
@@ -101,13 +110,13 @@ pom.xml (or build.gradle)                         # one build producing the runn
 ## G. Git
 
 - [ ] The base state lives on branch **`base-empty`** (= `config.yaml → app.base_ref`).
-- [ ] `.gitignore` excludes build output (`target/`, `node_modules/`, `src/main/resources/static/*`
-      if generated, `*.jar`) so the agent's committed delta is source only.
+- [ ] `.gitignore` excludes build output (`target/`, `node_modules/`, `*.jar`, and the generated
+      `src/main/resources/PUBLIC/assets/`) so the agent's committed delta is source only.
 - [ ] Local repo is enough (the harness reads it by path); a remote is optional.
 
 ## H. Smoke test before wiring into a run
 
-- [ ] From a clean `base-empty` checkout: `bin/build` → `bin/start` → `curl /actuator/health` = UP
+- [ ] From a clean `base-empty` checkout: `bin/build` → `bin/start` → `curl /health` = UP
       → shell renders → `bin/stop` frees the port.
 - [ ] Drop one throwaway spec into `e2e/specs/` and confirm `bin/e2e` builds, serves, runs it, and
       stops — the whole agent-test loop end to end.

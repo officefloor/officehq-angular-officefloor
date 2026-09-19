@@ -1,15 +1,11 @@
 #!/usr/bin/env bash
-# Build the whole app into ONE runnable jar: compile the OfficeFloor backend AND the front-end,
-# baking the SPA into src/main/resources/static so the jar serves it. PINNED — do not edit.
-# Contract: BASE_CHECKLIST.md §C. Must succeed from a clean base-empty checkout (§A).
+# Build the whole app into ONE runnable jar. The Maven build runs the front-end (frontend-maven-
+# plugin) into src/main/resources/PUBLIC, then packages the WoOF app (spring-boot repackage,
+# mainClass net.officefloor.OfficeFloorMain) into target/*.jar. PINNED — do not edit.
+# Contract: BASE_CHECKLIST.md §B, §C. Must succeed from a clean base-empty checkout (§A).
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-# TODO: build the front-end into src/main/resources/static, e.g.:
-#   (cd src/main/frontend && npm ci && npm run build)   # vite build -> ../resources/static
-# TODO: build the backend jar (front-end static already in place), e.g.:
-#   ./mvnw -q -DskipTests package
-#   # or: ./gradlew bootJar
-
-echo "TODO: implement bin/build (see BASE_CHECKLIST.md §B, §C)" >&2
-exit 1
+# One command: the pom's frontend-maven-plugin builds the SPA into PUBLIC during the build.
+exec ./mvnw -q -DskipTests package
+# TODO: add the Maven wrapper (./mvnw) or switch to `mvn` if a system Maven is guaranteed.

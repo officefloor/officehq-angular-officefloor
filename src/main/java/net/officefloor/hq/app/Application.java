@@ -1,21 +1,16 @@
 package net.officefloor.hq.app;
 
-// SKELETON. TODO: the Spring Boot entry point with the OfficeFloor plugin enabled so OfficeFloor
-// runs within Spring in one JVM (BASE_CHECKLIST.md §B). Keep this minimal; domain code is added
-// per checkpoint.
-//
-// import org.springframework.boot.SpringApplication;
-// import org.springframework.boot.autoconfigure.SpringBootApplication;
-//
-// @SpringBootApplication
-// // TODO: enable the OfficeFloor Spring integration (your annotation / auto-config)
-// public class Application {
-//   public static void main(String[] args) {
-//     SpringApplication.run(Application.class, args);
-//   }
-// }
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-public final class Application {
-    private Application() {}
-    // TODO: replace with the real Spring Boot + OfficeFloor bootstrap.
+/**
+ * Spring configuration SUPPLIED into OfficeFloor (referenced by
+ * officefloor/suppliers/Spring.yml -> configuration.class). Its @Bean methods and any
+ * {@code @RestController} / {@code @Service} become OfficeFloor dependencies. There is NO main()
+ * here — the executable jar's main class is net.officefloor.OfficeFloorMain (see pom.xml).
+ *
+ * At the base this is empty; checkpoints add @Bean services / controllers as features are built.
+ */
+@SpringBootApplication
+public class Application {
+    // TODO: @Bean service definitions added per checkpoint. Keep additive.
 }

@@ -1,0 +1,7 @@
+# POST /__test__/seed -> TestSupport.seed : insert the fixture a spec needs (Arrange, not Assert).
+# App code, evolves with the schema (NOT pinned); a change that breaks a prior spec's seed is a
+# seed-path regression. TODO: guard to a harness-only OfficeFloor profile.
+post:
+  resource: net.officefloor.hq.app.TestSupport
+  procedure: seed
+  method: seed

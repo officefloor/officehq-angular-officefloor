@@ -1,20 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  SKELETON build for the base app. TODO: complete against your real Spring Boot + OfficeFloor
-  plugin coordinates. This must produce ONE runnable jar that embeds H2, runs Flyway on boot,
-  and serves the SPA (built into src/main/resources/static) + the API. See BASE_CHECKLIST.md §B.
+  First-pass pom for the react-officefloor base app. Coordinates below are VERIFIED against the
+  OfficeFloor tutorials (officefloor/OfficeFloor: tutorials/spring_officefloor/SpringWebMvcHttpServer
+  and tutorials/native/persistence/DatabaseHttpServer). See BASE_CHECKLIST.md.
 
-  Dependencies to wire in (verify versions at build time):
-    - spring-boot-starter-web
-    - spring-boot-starter-actuator            (health probe)
-    - OfficeFloor Spring plugin               (OfficeFloor within Spring — your coordinates)
-    - com.h2database:h2                        (runtime; in-memory)
-    - org.flywaydb:flyway-core                 (schema migrations on boot)
-    - (test/dev) whatever the /__test__ support needs
+  Model (from those tutorials): OfficeFloor (WoOF) IS the HTTP server; Spring is SUPPLIED into it
+  (officespring_webmvc); H2 + Flyway are OfficeFloor persistence integrations; the executable jar is
+  built with spring-boot-maven-plugin using net.officefloor.OfficeFloorMain as the main class.
 
-  Front-end build: either the frontend-maven-plugin (com.github.eirslett) driving
-  `npm ci && npm run build` with output to src/main/resources/static, OR let bin/build run the
-  front-end build separately before packaging. Keep bin/build as the single entry point.
+  TODO (versions): align ${officefloor.version} and ${spring-boot.version} with a real OfficeFloor
+  release — the tutorials inherit these from the OfficeFloor parent/BOM (reactor ${revision}); the
+  woof-archetype pom is the canonical source of the managed versions. officefloor-maven-plugin was
+  documented at 3.40.0. OfficeFloor targets Java 17 and Spring Boot 3.x.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -26,7 +23,121 @@
   <version>0.0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <!-- TODO: parent (spring-boot-starter-parent) or dependencyManagement, properties, dependencies,
-       and the build plugins (spring-boot-maven-plugin, front-end build). -->
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.release>17</maven.compiler.release>
+    <!-- TODO: pin to a real release (see woof-archetype). Plugin documented at 3.40.0. -->
+    <officefloor.version>3.40.0</officefloor.version>
+    <!-- TODO: align with the Spring Boot that ${officefloor.version} supports (SB 3.x). -->
+    <spring-boot.version>3.3.4</spring-boot.version>
+    <!-- Front-end build toolchain (frontend-maven-plugin downloads these; keeps build hermetic). -->
+    <node.version>v20.11.1</node.version>
+    <npm.version>10.2.4</npm.version>
+  </properties>
 
+  <dependencies>
+    <!-- WoOF: OfficeFloor as the web/application server (serves PUBLIC/ + the .yml routes). -->
+    <dependency>
+      <groupId>net.officefloor.web</groupId>
+      <artifactId>woof</artifactId>
+      <version>${officefloor.version}</version>
+    </dependency>
+
+    <!-- Spring supplied INTO OfficeFloor: @Bean services + Spring Web MVC controllers usable as
+         OfficeFloor procedures (officefloor/suppliers/Spring.yml points at Application). -->
+    <dependency>
+      <groupId>net.officefloor.spring</groupId>
+      <artifactId>officespring_webmvc</artifactId>
+      <version>${officefloor.version}</version>
+    </dependency>
+
+    <!-- H2 in-memory DataSource managed object (officefloor/objects/DataSource.yml). -->
+    <dependency>
+      <groupId>net.officefloor.persistence</groupId>
+      <artifactId>officejdbc_h2</artifactId>
+      <version>${officefloor.version}</version>
+    </dependency>
+
+    <!-- Flyway migrations run on boot from src/main/resources/db/migration (empty at base). -->
+    <dependency>
+      <groupId>net.officefloor.persistence</groupId>
+      <artifactId>officeflyway_migrate</artifactId>
+      <version>${officefloor.version}</version>
+    </dependency>
+
+    <!-- Testing (used by any in-repo smoke test; the harness drives the built app via Playwright). -->
+    <dependency>
+      <groupId>net.officefloor.web</groupId>
+      <artifactId>woof_test</artifactId>
+      <version>${officefloor.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>net.officefloor.persistence</groupId>
+      <artifactId>officeflyway_test</artifactId>
+      <version>${officefloor.version}</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <!-- Build the React SPA into src/main/resources/PUBLIC so WoOF serves it as static content.
+           TODO: confirm the front-end build (vite) outDir is ../resources/PUBLIC. -->
+      <plugin>
+        <groupId>com.github.eirslett</groupId>
+        <artifactId>frontend-maven-plugin</artifactId>
+        <version>1.15.1</version>
+        <configuration>
+          <workingDirectory>src/main/frontend</workingDirectory>
+          <nodeVersion>${node.version}</nodeVersion>
+          <npmVersion>${npm.version}</npmVersion>
+        </configuration>
+        <executions>
+          <execution>
+            <id>install-node-and-npm</id>
+            <goals><goal>install-node-and-npm</goal></goals>
+            <phase>generate-resources</phase>
+          </execution>
+          <execution>
+            <id>npm-ci</id>
+            <goals><goal>npm</goal></goals>
+            <phase>generate-resources</phase>
+            <configuration><arguments>ci</arguments></configuration>
+          </execution>
+          <execution>
+            <id>npm-build</id>
+            <goals><goal>npm</goal></goals>
+            <phase>generate-resources</phase>
+            <configuration><arguments>run build</arguments></configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- Executable jar. OfficeFloor is the runtime; OfficeFloorMain is the main class while
+           spring-boot-maven-plugin generates the Spring metadata (per OfficeFloor's Spring Boot
+           packaging guidance). -->
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <version>${spring-boot.version}</version>
+        <configuration>
+          <mainClass>net.officefloor.OfficeFloorMain</mainClass>
+        </configuration>
+        <executions>
+          <execution>
+            <goals><goal>repackage</goal></goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- Optional dev convenience: `mvn officefloor:open` / run. Not used by the harness (it runs
+           the built jar via bin/start), but handy locally. -->
+      <plugin>
+        <groupId>net.officefloor.maven</groupId>
+        <artifactId>officefloor-maven-plugin</artifactId>
+        <version>${officefloor.version}</version>
+      </plugin>
+    </plugins>
+  </build>
 </project>

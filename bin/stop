@@ -4,10 +4,10 @@
 set -uo pipefail
 cd "$(dirname "$0")/.."
 
-# TODO: kill by recorded pid, then fall back to freeing the port, e.g.:
-#   [ -f .run/app.pid ] && kill "$(cat .run/app.pid)" 2>/dev/null || true
-#   rm -f .run/app.pid
-#   # backstop: fuser -k "${PORT:-3000}/tcp" 2>/dev/null || true
-
-echo "TODO: implement bin/stop (idempotent) — see BASE_CHECKLIST.md §C" >&2
+if [ -f .run/app.pid ]; then
+  kill "$(cat .run/app.pid)" 2>/dev/null || true
+  rm -f .run/app.pid
+fi
+# Backstop: free the port if something is still bound (needs fuser; ignore if absent).
+[ -n "${PORT:-}" ] && fuser -k "${PORT}/tcp" 2>/dev/null || true
 exit 0
