@@ -74,14 +74,19 @@ These commands must stay constant across checkpoints even as the app evolves. Th
 - [ ] **`data-testid` is immutable public API** — once introduced, never renamed/removed. State
       this rule in `CLAUDE.md`/`AGENTS.md` (pinned) so every agent turn obeys it.
 - [ ] **`/__test__` seed endpoint** (profile-guarded: only active under the harness's launch
-      profile). `POST /__test__/reset` (truncate all domain tables) + `POST /__test__/seed`
-      (insert a fixture payload). This is **app code and evolves** with the schema (NOT pinned); a
-      change that breaks a prior spec's seed is a *seed-path* regression (DESIGN.md §6).
+      profile). `POST /__test__/reset` (truncate all domain tables **and clear the audit file**) +
+      `POST /__test__/seed` (insert a fixture payload). This is **app code and evolves** with the
+      schema (NOT pinned); a change that breaks a prior spec's seed is a *seed-path* regression (§6).
+- [ ] **Audit file — the second assertion channel.** Audited/side-effect behaviour is written one
+      record per line to a known file via the `Audit` service (`app.audit.file`, `AUDIT_FILE`; both
+      `bin/start` and `bin/e2e` set it). Specs read it through `e2e/support/audit.ts`. The path +
+      one-line-per-record format is a stable contract like `data-testid`; a broken audit record for
+      a prior rule is a behaviour-loss regression (DESIGN.md §3, §6).
 - [ ] **Playwright project** in `e2e/` (`playwright.config.ts`, `package.json`) with `baseURL` =
-      `http://localhost:$PORT` and strict awaiting on `data-testid`. The harness copies authored
-      `cpNN` specs into `e2e/specs/` (`config.yaml → acceptance.dest_subpath`); do not commit specs
-      to the base.
-- [ ] A shared `e2e/support/` with a `beforeEach` reset+seed helper the specs call.
+      `http://localhost:$PORT`, `data-testid` as the default test id, strict awaiting. The harness
+      copies authored `cpNN` specs into `e2e/specs/`; do not commit specs to the base.
+- [ ] A shared `e2e/support/` with a `beforeEach` reset+seed helper (`seed.ts`) and the audit
+      reader (`audit.ts`).
 
 ## E. Agent-facing instructions (PINNED)
 

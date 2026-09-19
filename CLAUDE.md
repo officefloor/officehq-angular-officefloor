@@ -14,6 +14,10 @@ local change.
   `src/main/resources/db/migration/`; never edit an applied migration.
 - **Data is seeded through the app's own API in tests**, not committed as fixtures. If your feature
   needs new seed capability, extend the `/__test__` seed support.
+- **Audit / side-effect records go through the `Audit` service** (inject `Audit`, call
+  `record(...)`). It appends one record per line to the known audit file that tests read — that is
+  how audited behaviour is verified (the UI can't show it). Use the exact record text the task's
+  test expects; don't invent separate logging for audited behaviour.
 - **Keep it additive and local** (this is why the app stays maintainable):
   - a new page/route is a new file, not an edit to a central router;
   - features own their own state; there is no global domain store to reach into;

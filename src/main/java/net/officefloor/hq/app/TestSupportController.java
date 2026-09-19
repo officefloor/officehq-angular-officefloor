@@ -18,9 +18,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/__test__")
 public class TestSupportController {
 
-    /** Truncate all domain tables (respecting FK order) so each spec starts clean. */
+    private final Audit audit;
+
+    public TestSupportController(Audit audit) {
+        this.audit = audit;
+    }
+
+    /** Truncate all domain tables and clear the audit file so each spec starts clean. */
     @PostMapping("/reset")
     public void reset() {
+        audit.clear();
         // TODO: TRUNCATE the domain tables that exist at this checkpoint (inject a JdbcTemplate/repo).
     }
 
