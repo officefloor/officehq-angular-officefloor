@@ -1,14 +1,20 @@
-// SKELETON front-end entry (BASE_CHECKLIST.md §B, §E). The base renders a bare shell: a nav frame
-// and an empty home. Features are added per checkpoint as NEW files, not edits to shared surfaces.
-// Every observable element/value carries a stable data-test-id (never renamed/removed).
-//
-// TODO: mount the app shell with the opinionated conventions from CLAUDE.md:
-//   - file/manifest-based routing (adding a route = a new file under router/)
-//   - no global domain store (features own their state)
-//   - closed shared primitives in ui/ (composed, never branched per feature)
-//   - scoped styles
-//
-// Example anchor the base shell should expose:
-//   <nav data-test-id="app-nav"> ... </nav>
+import React from 'react';
+import { createRoot } from 'react-dom/client';
 
-export {};
+// Minimal base shell. The opinionated conventions (file/manifest routing under router/, closed
+// primitives under ui/, no global store, scoped styles) are how checkpoints add features additively
+// (CLAUDE.md). Every observable element/value carries a stable data-test-id, never renamed/removed.
+function App() {
+  return (
+    <div data-test-id="app-root">
+      <nav data-test-id="app-nav">OfficeHQ</nav>
+      <main data-test-id="app-home" />
+    </div>
+  );
+}
+
+createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+);
