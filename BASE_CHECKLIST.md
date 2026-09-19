@@ -69,16 +69,16 @@ These commands must stay constant across checkpoints even as the app evolves. Th
 
 ## D. The test contract (DESIGN.md §3, §9)
 
-- [ ] **`data-test-id` everywhere behaviour is observed.** The shell and every feature expose
-      stable `data-test-id` anchors; nothing the tests rely on uses CSS/DOM/text.
-- [ ] **`data-test-id` is immutable public API** — once introduced, never renamed/removed. State
+- [ ] **`data-testid` everywhere behaviour is observed.** The shell and every feature expose
+      stable `data-testid` anchors; nothing the tests rely on uses CSS/DOM/text.
+- [ ] **`data-testid` is immutable public API** — once introduced, never renamed/removed. State
       this rule in `CLAUDE.md`/`AGENTS.md` (pinned) so every agent turn obeys it.
 - [ ] **`/__test__` seed endpoint** (profile-guarded: only active under the harness's launch
       profile). `POST /__test__/reset` (truncate all domain tables) + `POST /__test__/seed`
       (insert a fixture payload). This is **app code and evolves** with the schema (NOT pinned); a
       change that breaks a prior spec's seed is a *seed-path* regression (DESIGN.md §6).
 - [ ] **Playwright project** in `e2e/` (`playwright.config.ts`, `package.json`) with `baseURL` =
-      `http://localhost:$PORT` and strict awaiting on `data-test-id`. The harness copies authored
+      `http://localhost:$PORT` and strict awaiting on `data-testid`. The harness copies authored
       `cpNN` specs into `e2e/specs/` (`config.yaml → acceptance.dest_subpath`); do not commit specs
       to the base.
 - [ ] A shared `e2e/support/` with a `beforeEach` reset+seed helper the specs call.
@@ -86,7 +86,7 @@ These commands must stay constant across checkpoints even as the app evolves. Th
 ## E. Agent-facing instructions (PINNED)
 
 - [ ] `CLAUDE.md` (and `AGENTS.md`) tell the agent: it is making a **full-stack** change
-      (migration + OfficeFloor server + front-end) from a plain-English request; the `data-test-id`
+      (migration + OfficeFloor server + front-end) from a plain-English request; the `data-testid`
       immutability rule; that it can run `bin/e2e` to test; the additive/opinionated conventions of
       the shell (routing, no global store, closed primitives, slice boundaries, scoped styles).
 - [ ] These never leak the checkpoint sequence (no cpNN references, no prior-request hints).

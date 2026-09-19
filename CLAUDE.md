@@ -7,9 +7,9 @@ local change.
 
 ## Rules
 
-- **`data-test-id` is immutable public API.** Expose a stable `data-test-id` on every element and
-  value the feature surfaces. **Never rename or remove a `data-test-id` that already exists** — it
-  is how the app is tested. Match exactly the `data-test-id` values your task's test expects.
+- **`data-testid` is immutable public API.** Expose a stable `data-testid` on every element and
+  value the feature surfaces. **Never rename or remove a `data-testid` that already exists** — it
+  is how the app is tested. Match exactly the `data-testid` values your task's test expects.
 - **Schema changes are Flyway migrations.** Add a new versioned migration under
   `src/main/resources/db/migration/`; never edit an applied migration.
 - **Data is seeded through the app's own API in tests**, not committed as fixtures. If your feature
