@@ -1,4 +1,0 @@
-# JDBC Connection managed object (injectable into procedures needing SQL). Verified: OfficeFloor
-# tutorial DatabaseHttpServer/src/main/resources/officefloor/objects/Connection.yml.
-managed-object:
-  source: net.officefloor.jdbc.ConnectionManagedObjectSource

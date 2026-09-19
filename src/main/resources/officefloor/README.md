@@ -1,8 +1,21 @@
-# OfficeFloor wiring
+# OfficeFloor REST wiring
 
-OfficeFloor declares its procedures/sections and wiring here. This directory is a **shared
-surface** (`config.yaml → app.shared_surfaces.backend`): a checkpoint that has to edit wiring to
-land a feature scores a boundary violation (DESIGN.md §8). The additive ideal is new wired
-functions/sections in new files, not growing a central file.
+Domain REST endpoints are declared here as **additive OfficeFloor YAML**, served by the
+officefloor-rest-spring-boot-4-starter inside the Spring Boot host. Each route is its own file:
 
-TODO: base wiring for the empty shell (health/API root). Domain wiring is added per checkpoint.
+```
+# officefloor/rest/<path>.GET.yml   (or .POST.yml, {param}.GET.yml, ...)
+service:
+  class: net.officefloor.hq.app.<SomeLogic>   # a class with a service(...) method
+```
+
+The logic class's `service(...)` method takes injected dependencies (Spring @Service beans, the
+data layer) and a `net.officefloor.web.ObjectResponse<T>` to send the response — verified shape:
+OfficeFloor tutorial SpringRestGettingStartedHttpServer.
+
+This directory is a **shared surface** (`config.yaml → app.shared_surfaces.backend`): the additive
+ideal is a **new .yml + a new logic class per endpoint**, never growing a central file — a
+checkpoint forced to edit shared wiring scores a boundary violation (DESIGN.md §8).
+
+The base has no domain routes; cp01 onward add them. (The `/__test__` seed endpoint and readiness
+`/actuator/health` are Spring-side — a @RestController and Actuator — not OfficeFloor routes.)

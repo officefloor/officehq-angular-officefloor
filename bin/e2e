@@ -13,9 +13,9 @@ bin/start
 cleanup() { bin/stop || true; }
 trap cleanup EXIT
 
-# Wait for readiness (the /health route), then run the Playwright specs against BASE_URL.
+# Wait for readiness (Actuator health), then run the Playwright specs against BASE_URL.
 for i in $(seq 1 60); do
-  if curl -fsS "${BASE_URL}/health" >/dev/null 2>&1; then break; fi
+  if curl -fsS "${BASE_URL}/actuator/health" >/dev/null 2>&1; then break; fi
   sleep 1
 done
 

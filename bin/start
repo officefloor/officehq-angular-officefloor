@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Start the app on $PORT: java -jar the built jar (main class net.officefloor.OfficeFloorMain). On
-# boot, officeflyway_migrate migrates the empty in-memory H2 up to the current schema and WoOF
-# serves the SPA (from PUBLIC/) + the .yml routes. Returns once launching (the harness polls
-# /health). PINNED — do not edit. Contract: BASE_CHECKLIST.md §B, §C.
+# Start the Spring Boot app on $PORT (main class net.officefloor.hq.app.Application). On boot, Flyway
+# migrates the empty in-memory H2 up to the current schema; Spring serves the SPA (static/) and the
+# OfficeFloor REST routes; the `harness` profile enables the /__test__ seed endpoint. Returns once
+# launching (the harness polls /actuator/health). PINNED — do not edit. Contract: §B, §C.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 mkdir -p .run
@@ -11,8 +11,5 @@ mkdir -p .run
 JAR="$(ls -t target/*.jar 2>/dev/null | head -n1 || true)"
 [ -n "$JAR" ] || { echo "no jar in target/ — run bin/build first" >&2; exit 1; }
 
-# TODO: confirm how OfficeFloorMain takes the HTTP port and the harness profile that enables the
-#   /__test__ routes (OfficeFloor profile-specific config), e.g. -Dhttp.port / --http.port and
-#   -Dofficefloor.profiles=harness (verify exact flags).
-nohup java -jar "$JAR" --http.port="$PORT" > .run/app.log 2>&1 &
+nohup java -jar "$JAR" --server.port="$PORT" --spring.profiles.active=harness > .run/app.log 2>&1 &
 echo $! > .run/app.pid

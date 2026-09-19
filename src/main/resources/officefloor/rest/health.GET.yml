@@ -1,6 +1,0 @@
-# GET /health -> Health.check : the harness readiness probe (config.yaml -> app.health_url).
-# Route shape verified: OfficeFloor tutorial SpringWebMvcHttpServer rest/officefloor/rest.GET.yml.
-get:
-  resource: net.officefloor.hq.app.Health
-  procedure: check
-  method: check

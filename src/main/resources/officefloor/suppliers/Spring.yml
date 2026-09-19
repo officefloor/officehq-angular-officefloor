@@ -1,6 +1,0 @@
-# Supply Spring into OfficeFloor: the @SpringBootApplication class provides @Bean services (and
-# Spring Web MVC controllers) as OfficeFloor dependencies. Verified shape: OfficeFloor tutorial
-# SpringWebMvcHttpServer/src/main/resources/officefloor/suppliers/Spring.yml.
-source: SPRING
-properties:
-  configuration.class: net.officefloor.hq.app.Application

@@ -1,7 +1,0 @@
-# POST /__test__/reset -> TestSupport.reset : truncate all domain tables (per-spec isolation).
-# App code, evolves with the schema (NOT pinned). TODO: guard to a harness-only OfficeFloor profile
-# so it is absent from a real deploy. See BASE_CHECKLIST.md §D, ui-long-degradation-test DESIGN.md §9.
-post:
-  resource: net.officefloor.hq.app.TestSupport
-  procedure: reset
-  method: reset

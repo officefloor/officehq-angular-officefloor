@@ -1,8 +1,9 @@
 # Working in this app
 
 You are making ONE change to this application in response to the change request you were given.
-Implement it as a **full-stack change**: whatever the request needs across the database schema,
-the OfficeFloor server, and the front-end — as a small, additive, local change.
+Implement it as a **full-stack change**: whatever the request needs across the database schema, the
+server (OfficeFloor REST on a Spring Boot host), and the React front-end — as a small, additive,
+local change.
 
 ## Rules
 
@@ -24,7 +25,13 @@ the OfficeFloor server, and the front-end — as a small, additive, local change
 
 ## Layout
 
-- `src/main/frontend/**` — the front-end (TypeScript). `router/` and `ui/` are shared surfaces.
-- `src/main/java/**` — the OfficeFloor server. `src/main/resources/officefloor/**` — wiring.
-- `src/main/resources/db/migration/**` — Flyway migrations.
+- `src/main/frontend/**` — the React front-end (TypeScript). `router/` and `ui/` are shared
+  surfaces; a new page is a new file, not an edit to `router/`.
+- `src/main/resources/officefloor/rest/<path>.<METHOD>.yml` — a REST endpoint = a **new YAML file**
+  (`service: { class: net.officefloor.hq.app.<Logic> }`) + a **new logic class** whose
+  `service(...)` method takes injected Spring beans/data + `ObjectResponse<T>`. Additive: one file
+  per endpoint, never a central router.
+- `src/main/java/**` — logic classes and Spring `@Service`/`@Repository` beans (business logic +
+  data access). `Application`, `SpaConfig`, `TestSupportController` are base infrastructure.
+- `src/main/resources/db/migration/**` — Flyway migrations (new `V<n>__*.sql` per schema change).
 - `bin/e2e` — build, start the app, run your test, stop. Run it to check your work.

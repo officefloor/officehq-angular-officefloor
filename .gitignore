@@ -1,12 +1,11 @@
 # Build output — the agent's committed delta is source only (BASE_CHECKLIST.md §G).
 target/
-build/
 *.jar
 node_modules/
 .run/
-# Generated SPA bundle served from static (keep the dir via .gitkeep, ignore built assets).
-src/main/resources/static/*
-!src/main/resources/static/.gitkeep
+# Front-end build artifacts written into static/ by bin/build (vite outDir). Keep the committed
+# base shell (static/index.html) and ignore generated bundles.
+src/main/resources/static/assets/
 # Playwright
 e2e/test-results/
 e2e/playwright-report/
