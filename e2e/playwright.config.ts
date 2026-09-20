@@ -9,8 +9,13 @@ export default defineConfig({
     // Contract attribute is data-testid — Playwright's default, so no testIdAttribute override
     // needed (DESIGN.md §3). Strict awaiting on data-testid presence is the flake guard (§9).
   },
-  // Serial + fresh reset+seed per spec (see support/seed.ts) keeps specs isolated.
+  // Serial + fresh reset+seed per spec (see support/seed.ts) keeps specs isolated. workers:1 is
+  // REQUIRED: every spec drives ONE shared app + in-memory H2 through /__test__/reset+seed, so the
+  // whole suite must run serially. `fullyParallel:false` alone only serialises tests WITHIN a file
+  // — Playwright still runs different spec FILES on parallel workers by default, and those would
+  // stomp on each other's seed data (false cross-file failures). One worker = fully serial.
   fullyParallel: false,
+  workers: 1,
   reporter: [['list']],
   projects: [
     {
