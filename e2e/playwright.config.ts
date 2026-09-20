@@ -13,6 +13,15 @@ export default defineConfig({
   fullyParallel: false,
   reporter: [['list']],
   projects: [
-    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
+    {
+      name: 'chromium',
+      use: {
+        ...devices['Desktop Chrome'],
+        // Headless Chromium in a restricted/confined environment (e.g. the harness's
+        // Landlock-confined agent turn) needs its own sandbox off and shared memory in /tmp,
+        // or renderer/GPU child processes crash. Harmless for the unconfined gate run too.
+        launchOptions: { args: ['--no-sandbox', '--disable-dev-shm-usage', '--disable-gpu'] },
+      },
+    },
   ],
 });
