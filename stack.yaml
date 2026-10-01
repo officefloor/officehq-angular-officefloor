@@ -29,7 +29,13 @@ layers:
     # module. Anchors entry_cc / wmc_handler / erosion_handler to the same ROLE the additive arm
     # measures (its file-based route components), which `wmc_max` cannot do: it reports whatever
     # the heaviest file happens to be, and the two arms answer with different kinds of file.
-    handler_pattern: "/features/[^:]*/route[^:]*::"
+    # The feature's SCREEN-RENDERING unit — chain1 names it `<Entity>Page.tsx`, chain2
+    # collapsed to `feature.tsx`, so both are matched. NOT `route.tsx`: this arm's route module
+    # is a data declaration (`export const route = {...}`) with no functions in it, so anchoring
+    # there matched nothing and blanked every handler metric. That the declared route unit holds
+    # no code is itself the finding — all of it lives in the screen component, which is the unit
+    # the additive arm anchors to (its file-based route components).
+    handler_pattern: "/features/[^:]*(Page|feature)[^:]*::"
     # This arm's declared additive unit, for fnpkg_*: one route module per feature.
     function_package_glob: "src/main/frontend/features/*/route.tsx"
   backend:
