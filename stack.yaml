@@ -22,6 +22,23 @@ layers:
   frontend:
     root: src/main/frontend
     ext: [ts, tsx]
+    # jscpd's language for this layer's duplication metrics (dup_*).
+    jscpd_format: typescript,tsx
+    # The layer's ENTRY SURFACE, as a regex over "<file>::<function>" — the unit a new feature
+    # enters through. This arm registers a page per feature, so that is the feature's route
+    # module. Anchors entry_cc / wmc_handler / erosion_handler to the same ROLE the additive arm
+    # measures (its file-based route components), which `wmc_max` cannot do: it reports whatever
+    # the heaviest file happens to be, and the two arms answer with different kinds of file.
+    handler_pattern: "/features/[^:]*/route[^:]*::"
+    # This arm's declared additive unit, for fnpkg_*: one route module per feature.
+    function_package_glob: "src/main/frontend/features/*/route.tsx"
   backend:
     root: src/main/java
     ext: [java]
+    jscpd_format: java
+    handler_pattern: "::service$"
+    config_globs: ["src/main/resources/officefloor/**/*.yml"]
+    node_roots:
+      wiring_glob: "src/main/resources/officefloor/rest/**/*.yml"
+      class_regex: 'class:\s*([\w.]+)'
+      node_method: service
