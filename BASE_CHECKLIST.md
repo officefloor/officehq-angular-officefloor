@@ -6,11 +6,12 @@ This is a **base repository** for `ui-long-degradation-test` (see that repo's `D
 one full-stack English change request per checkpoint — committing each checkpoint on that run
 branch. The base branch is only ever read.
 
-This stack is **React (front-end) + OfficeFloor (backend)** on in-memory H2 — hence the name
-`officehq-react-officefloor`.
+This stack is **Angular (front-end) + OfficeFloor (backend)** on in-memory H2 — hence the name
+`officehq-angular-officefloor`. It is the FRAMEWORK CONTROL: same backend, same tests, same agent
+rules as the React arm, different front-end framework. Node is pinned to v22.12.0 because Angular
+21's CLI requires `^20.19 || ^22.12 || >=24` and rejects the React arms' v20.11.1.
 
-**This folder is a skeleton: every item below is a stub with `TODO` markers.** Fill them in to get
-a runnable base. Because the harness only depends on the *contract* (not the tech), you create a
+**This folder is green** (§A–§H verified). Because the harness only depends on the *contract* (not the tech), you create a
 new stack as a **home-level sibling** `~/officehq-<frontend>-<backend>` (name both layers, since
 either may vary), satisfy the same checklist with a different technology, and point `app.repo` at
 it — that is how different technology stacks are compared, one run each, to see which resists

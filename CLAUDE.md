@@ -2,7 +2,7 @@
 
 You are making ONE change to this application in response to the change request you were given.
 Implement it as a **full-stack change**: whatever the request needs across the database schema, the
-server (OfficeFloor REST on a Spring Boot host), and the React front-end — as a small, additive,
+server (OfficeFloor REST on a Spring Boot host), and the Angular front-end — as a small, additive,
 local change.
 
 ## Rules
@@ -22,18 +22,29 @@ local change.
   how audited behaviour is verified (the UI can't show it). Use the exact record text the task's
   test expects; don't invent separate logging for audited behaviour.
 - **Keep it additive and local** (this is why the app stays maintainable):
-  - a new page/route is a new file, not an edit to a central router;
-  - features own their own state; there is no global domain store to reach into;
-  - shared UI primitives (`src/main/frontend/ui/`) are *composed*, not branched with per-feature
-    `if`s;
+  - a new page is a **new standalone component file** under `src/app/features/<name>/`, plus ONE
+    lazy entry in `src/app/app.routes.ts` — give that entry `data: { section, label }` and it
+    appears in the nav bar automatically, because the shell reads the router's own config. Never
+    edit the shell, and never add a page by growing an existing component;
+  - features own their own state — component fields/signals, or a feature-scoped `@Injectable`
+    service; there is no global domain store to reach into;
+  - shared UI primitives (`src/app/ui/`) are *composed*, not branched with per-feature `if`s;
   - features do not import each other; keep each feature's code together.
+  - data access is Angular's `HttpClient` (already provided), injected into a feature service or
+    the component that needs it.
 - **Do not edit** the build/run scripts (`bin/build`, `bin/start`, `bin/stop`, `bin/e2e`) or this
   file. Use `bin/e2e` to run your test as you work.
 
 ## Layout
 
-- `src/main/frontend/**` — the React front-end (TypeScript). `router/` and `ui/` are shared
-  surfaces; a new page is a new file, not an edit to `router/`.
+- `src/main/frontend/**` — the Angular front-end (TypeScript), built by `ng build` into
+  `src/main/resources/static`.
+  - `src/app/features/<name>/**` — a feature's components and its service. One component per file.
+  - `src/app/app.routes.ts` — the route table. A shared surface: a page costs ONE lazy entry here
+    and nothing else, and that entry's `data` supplies its nav link.
+  - `src/app/app.ts`, `src/app/app.config.ts` — the shell and the app's wiring. Do not edit.
+  - `src/app/ui/**` — shared presentational components, *composed*, never branched with
+    per-feature `if`s.
 - `src/main/resources/officefloor/rest/api/<path>.<METHOD>.yml` — a REST endpoint = a **new YAML
   file** (`service: { class: net.officefloor.hq.app.<Logic> }`) + a **new logic class** whose
   `service(...)` method takes injected Spring beans/data + `ObjectResponse<T>` (and, for a body,
