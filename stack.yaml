@@ -1,31 +1,11 @@
-# What this STACK is, for the harness (~/ui-long-degradation-test). Read at `base-empty`, never
-# from the working tree, so a run always measures the layers the base declared.
-#
-# This is the FRAMEWORK CONTROL for the front-end comparison: Angular instead of React, with the
-# backend, the tests and the checkpoints held constant. It answers the sharpest objection to the
-# React-vs-React result — that a React page component bloating is a property of the agent rather
-# than of the framework. Angular makes that harder (one component per file, DI instead of
-# prop-drilling, routing declared as config), so if its routed components still bloat the finding
-# generalises; if they do not, the finding becomes "framework conventions do the work", which is
-# equally worth reporting.
-#
-# Lizard does NOT class-qualify TypeScript, so an Angular component's methods land at FILE scope
-# exactly like React's free functions — and since Angular's convention is one component per file,
-# file scope is component scope. `wmc_max`, `erosion` and `container_stats` therefore stay directly
-# comparable with the React arms (DESIGN.md §8).
+# Per-layer source roots and tooling settings for this project.
 layers:
   frontend:
     root: src/main/frontend/src
     ext: [ts]
     jscpd_format: typescript
-    # Angular and React share an extension, so the unit vocabulary cannot be inferred from it:
-    # say which idiom this stack is written in (harness.class_shape).
     unit_vocabulary: angular
-    # The layer's ENTRY SURFACE: the routed component a feature is reached through. Anchors the
-    # role-comparable handler metrics (entry_cc, wmc_handler, erosion_handler) to the same ROLE the
-    # other arms measure, which `wmc_max` cannot do across stacks.
     handler_pattern: "/features/[^:]*::"
-    # The declared additive unit: count rising while size stays flat is the healthy shape.
     function_package_glob: "src/main/frontend/src/app/features/**/*.ts"
   backend:
     root: src/main/java
